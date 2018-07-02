@@ -1,8 +1,10 @@
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import javax.lang.model.element.Element;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -10,7 +12,9 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.cert.X509Certificate;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.HandlerResolver;
 
 import com.vmware.vim25.InvalidLocaleFaultMsg;
 import com.vmware.vim25.InvalidLoginFaultMsg;
@@ -82,6 +86,10 @@ public class HelloVworld {
 
 		VimService vimService = new VimService();
 		VimPortType vimPort = vimService.getVimPort();
+		
+		Element token;
+		String vcServiceUrl;
+		HandlerResolver defaultHandler = vimService.getHandlerResolver();
 
 		Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
 		ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
@@ -95,9 +103,15 @@ public class HelloVworld {
 			ServiceContent serviceContent = vimPort.retrieveServiceContent(serviceInstance);
 			vimPort.login(serviceContent.getSessionManager(), username, password, null);
 
-			System.out.println(serviceContent.getAbout().getFullName());
-			System.out.println("Server type is " + serviceContent.getAbout().getApiType());
-			System.out.println("API version is " + serviceContent.getAbout().getApiVersion());
+			XMLGregorianCalendar ct = vimPort.currentTime(serviceInstance);
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			System.out.println("Server Time: " + sdf.format(ct.toGregorianCalendar().getTime()));
+			System.out.println("Full name: " + serviceContent.getAbout().getFullName());
+			System.out.println("API type: " + serviceContent.getAbout().getApiType());
+			System.out.println("API version: " + serviceContent.getAbout().getApiVersion());
+			System.out.println("OS: " + serviceContent.getAbout().getOsType());
+			
+			
 		} catch (RuntimeFaultFaultMsg e) {
 			e.printStackTrace();
 		} catch (InvalidLocaleFaultMsg e) {
