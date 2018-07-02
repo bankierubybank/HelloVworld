@@ -17,6 +17,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.HandlerResolver;
 
+import com.vmware.sso.client.soaphandlers.HeaderHandlerResolver;
+import com.vmware.sso.client.soaphandlers.TimeStampHandler;
+import com.vmware.sso.client.soaphandlers.WsSecuritySignatureAssertionHandler;
 import com.vmware.vim25.InvalidLocaleFaultMsg;
 import com.vmware.vim25.InvalidLoginFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
@@ -24,6 +27,7 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.VimPortType;
 import com.vmware.vim25.VimService;
+import com.vmware.vsphere.soaphandlers.HeaderCookieExtractionHandler;
 
 public class HelloVworld {
 	
@@ -93,6 +97,14 @@ public class HelloVworld {
 		HandlerResolver defaultHandler = vimService.getHandlerResolver();
 		HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver();
 		HeaderCookieExtractionHandler cookieExtractor = new HeaderCookieExtractionHandler();
+		handlerResolver.addHandler(cookieExtractor);
+		handlerResolver.addHandler(new TimeStampHandler());
+		handlerResolver.addHandler(new SamlTokenHandler(token));
+		handlerResolver.addHandler(new WsSecuritySignatureAssertionHandler(
+		 userCert.getPrivateKey(),
+		 userCert.getUserCert(),
+		 Utils.getNodeProperty(token, "ID")));
+		vimService.setHandlerResolver(handlerResolver);
 		
 		Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
 		ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
