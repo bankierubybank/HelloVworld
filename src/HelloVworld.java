@@ -12,6 +12,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.cert.X509Certificate;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.HandlerResolver;
@@ -90,7 +91,9 @@ public class HelloVworld {
 		Element token;
 		String vcServiceUrl;
 		HandlerResolver defaultHandler = vimService.getHandlerResolver();
-
+		HeaderHandlerResolver handlerResolver = new HeaderHandlerResolver();
+		HeaderCookieExtractionHandler cookieExtractor = new HeaderCookieExtractionHandler();
+		
 		Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
 		ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
 		ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
