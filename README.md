@@ -4,6 +4,7 @@ ESXi is running in VM on local machine
 - ip: 192.168.126.128
 - username: root
 - password: test@VMware1
+VMWare Image: VMware-VMvisor-Installer-6.7.0-8169922.x86_64
 
 Reference Docs
 https://blogs.vmware.com/developer/2014/07/getting-started-vsphere-management-sdk.html
